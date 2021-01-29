@@ -7,8 +7,7 @@ export const saveFighterObj = async (fighterObj) => {
         fighterId: fighterObj.fighterId,
     });
     try {
-        const newFighter = await fighter.save();
-        console.log(newFighter)
+        await fighter.save();
     } catch (error) {
         console.log(error);
     }

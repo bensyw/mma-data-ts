@@ -7,9 +7,9 @@ export interface Fighter {
     readonly fighterId: string;
 }
 
-export const getFighterObjs = async (page: Page) => {
+export const getFighterObjs = async (page: Page, letter: string) => {
 
-    await page.goto('http://www.espn.com/mma/fighters?search=a');
+    await page.goto(process.env.FIGHTER_URL + letter);
     const fighterObjs = await page.$$eval('tr.oddrow>td>a, tr.evenrow>td>a', anchorEls => {
         return Array.from(anchorEls, anchorEl => {
             const anchorURL = anchorEl.getAttribute('href');
