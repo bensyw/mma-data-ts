@@ -10,12 +10,12 @@ export const getFighterObjsWrapper = async () => {
     const browser = await chromium.launch();
     const page = await browser.newPage();
     const fighterObjs = await getFighterObjs(page);
-    console.log(fighterObjs);
     await page.close();
     await browser.close();
+    return fighterObjs;
 }
 
-const saveFighterObjWrapper = async () => {
+export const saveFighterObjWrapper = async () => {
     mongoose.connect(process.env.DATABASE_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -23,8 +23,10 @@ const saveFighterObjWrapper = async () => {
     const db = mongoose.connection
     db.on('error', (error) => console.error(error))
     db.once('open', () => console.log('Connected to Database'))
-    const testFighterObj = { firstName: 'Isa', lastName: 'Abiev', fighterId: '3151935' };
-    await saveFighterObj(testFighterObj);
+    const fighterObjs = await getFighterObjsWrapper();
+
+    await Promise.all(fighterObjs.map(fighterObj => saveFighterObj(fighterObj)))
+    db.close();
 }
 
 saveFighterObjWrapper();
