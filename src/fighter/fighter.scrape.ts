@@ -1,7 +1,7 @@
 /* eslint-disable functional/prefer-type-literal */
 import { Page } from 'playwright';
 
-interface Fighter {
+export interface Fighter {
     readonly firstName: string;
     readonly lastName: string;
     readonly fighterId: string;
@@ -23,5 +23,6 @@ export const getFighterObjs = async (page: Page) => {
             return fighterObj
         })
     });
-    console.log(fighterObjs)
+    return fighterObjs
+
 }
