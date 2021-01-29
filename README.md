@@ -1,3 +1,3 @@
-# mma-datata
+# MMA-data
 
-CoCollect
+Collect MMA fighter and their record data with headless browser. Powered by TypeScript.
