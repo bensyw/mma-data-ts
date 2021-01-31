@@ -1,6 +1,6 @@
 import { Page } from "playwright";
 
-import { IFighterName, IFightHistory } from "./fighter.model";
+import { IFighterName, IFightHistory } from "../types/Fighter";
 
 export const getFighterNameObjs = async (page: Page, letter: string): Promise<readonly IFighterName[]> => {
     await page.goto(process.env.FIGHTER_URL + letter);

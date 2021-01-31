@@ -1,5 +1,6 @@
+import { IFighter } from "../types/Fighter";
+
 import Fighter from "./fighter.model";
-import { IFighter } from "./fighter.model";
 
 export const saveFighterObj = async (fighterObj: IFighter): Promise<void> => {
     const fighter = new Fighter({
