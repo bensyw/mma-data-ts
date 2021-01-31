@@ -3,6 +3,7 @@ dotenv.config({ path: __dirname + '/../.env' });
 import mongoose from "mongoose";
 import { chromium } from 'playwright';
 
+import { getFightHistory } from "./fightHistory/fightHistory.scrape";
 import { saveFighterObj } from "./fighter/fighter.dal";
 import { getFighterObjs } from './fighter/fighter.scrape';
 
@@ -34,4 +35,10 @@ export const saveFighterObjWrapper = async () => {
     console.log('Disconnected from Database');
 }
 
-saveFighterObjWrapper();
+export const getFightHistoryWrapper = async () => {
+    const browser = await chromium.launch();
+    await getFightHistory('2506549', browser);
+    await browser.close();
+}
+
+getFightHistoryWrapper();
