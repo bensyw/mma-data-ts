@@ -10,7 +10,7 @@ import { getPublicIP } from "./utility/network";
 
 const SCRAPING_TIMTOUT = 2000;
 
-export const scrapeAllFighter = async () => {
+export const scrapeAllFighter = async (): Promise<void> => {
     // Connect to database
     mongoose.connect(process.env.DATABASE_URL, {
         useNewUrlParser: true,

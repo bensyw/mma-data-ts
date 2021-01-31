@@ -1,14 +1,15 @@
 import { Page } from "playwright";
 
-export const getFighterNameObjs = async (page: Page, letter: string) => {
+import { IFighterName, IFightHistory } from "./fighter.model";
 
+export const getFighterNameObjs = async (page: Page, letter: string): Promise<readonly IFighterName[]> => {
     await page.goto(process.env.FIGHTER_URL + letter);
     const fighterNameObjs = await page.$$eval("tr.oddrow>td>a, tr.evenrow>td>a", anchorEls => {
         return Array.from(anchorEls, anchorEl => {
             const anchorURL = anchorEl.getAttribute("href");
             const anchorInnerText = (<HTMLElement>anchorEl).innerText;
             const fighterNames = anchorInnerText.split(", ");
-            const fighterNameObj = {
+            const fighterNameObj: IFighterName = {
                 firstName: fighterNames[1],
                 lastName: fighterNames[0],
                 fighterId: anchorURL.split("/").slice(-2)[0]
@@ -19,7 +20,7 @@ export const getFighterNameObjs = async (page: Page, letter: string) => {
     return fighterNameObjs;
 }
 
-export const getFightHistoryObjs = async (page: Page, fighterId: string) => {
+export const getFightHistoryObjs = async (page: Page, fighterId: string): Promise<readonly IFightHistory[]> => {
     await page.goto(process.env.FIGHT_HISTORY_URL + fighterId);
     const allFightHistoryObjs = await page.$$eval(".ResponsiveTable.fight-history table tbody tr", rowEls => {
         return Array.from(rowEls, rowEl => {
@@ -33,7 +34,7 @@ export const getFightHistoryObjs = async (page: Page, fighterId: string) => {
             } else {
                 const anchorURL = anchorEl.getAttribute("href");
                 const OpponentId = anchorURL.split("/").slice(-2)[0];
-                const fightHistoryObj = {
+                const fightHistoryObj: IFightHistory = {
                     date: dataArray[0],
                     opponent: dataArray[1],
                     opponnetId: OpponentId,

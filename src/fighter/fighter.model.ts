@@ -1,7 +1,13 @@
 /* eslint-disable functional/prefer-type-literal */
 import mongoose from "mongoose";
 
-export interface IFightHistory extends mongoose.Document {
+export interface IFighterName {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly fighterId: string;
+}
+
+export interface IFightHistory {
     readonly date: string;
     readonly opponent: string;
     readonly opponnetId: string;
@@ -11,12 +17,12 @@ export interface IFightHistory extends mongoose.Document {
     readonly time: string;
     readonly event: string;
 }
-export interface IFighter extends mongoose.Document {
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly fighterId: string;
+
+export interface IFighter extends IFighterName {
     readonly fightHistory: readonly IFightHistory[];
 }
+
+interface IFighterDocument extends IFighter, mongoose.Document { }
 
 const fightHistorySchema = new mongoose.Schema({
     date: { type: String },
@@ -36,4 +42,4 @@ const fighterSchema = new mongoose.Schema({
     fightHistory: [fightHistorySchema]
 })
 
-export default mongoose.model<IFighter>("Fighter", fighterSchema);
+export default mongoose.model<IFighterDocument>("IFighter", fighterSchema);
