@@ -39,3 +39,25 @@ Public IP: xxx.xxx.xxx.xxx
 Saving letter 1/26 [=-------------------------]
 Saving fighter 1037/1343 [=======================================-----------]
 ```
+
+## Document Schema
+```JavaScript
+// TODO: Add strongly typed schema
+const fightHistorySchema = new mongoose.Schema({
+    date: { type: String },
+    opponent: { type: String },
+    opponnetId: { type: String },
+    result: { type: String },
+    decision: { type: String },
+    round: { type: String },
+    time: { type: String },
+    event: { type: String },
+});
+
+const fighterSchema = new mongoose.Schema({
+    firstName: { type: String },
+    lastName: { type: String },
+    fighterId: { type: String },
+    fightHistory: [fightHistorySchema]
+})
+```
