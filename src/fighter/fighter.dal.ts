@@ -5,6 +5,7 @@ export const saveFighterObj = async (fighterObj) => {
         firstName: fighterObj.firstName,
         lastName: fighterObj.lastName,
         fighterId: fighterObj.fighterId,
+        fightHistory: fighterObj.fightHistory
     });
     try {
         await fighter.save();

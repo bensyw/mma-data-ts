@@ -3,9 +3,10 @@ dotenv.config({ path: __dirname + '/../.env' });
 import mongoose from "mongoose";
 import { chromium } from 'playwright';
 
-import { getFightHistory } from "./fightHistory/fightHistory.scrape";
 import { saveFighterObj } from "./fighter/fighter.dal";
-import { getFighterObjs } from './fighter/fighter.scrape';
+import { getFighterNameObjs, getFightHistoryObjs } from './fighter/fighter.scrape';
+
+const SCRAPING_TIMTOUT = 3000;
 
 export const saveFighterObjWrapper = async () => {
     // Connect to database
@@ -18,39 +19,34 @@ export const saveFighterObjWrapper = async () => {
     db.once('open', () => console.log('Connected to Database'))
     // Start browser and page
     const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const pageAllFighter = await browser.newPage();
+    const pageSingleFighter = await browser.newPage();
     // Get and save fighterobjs from 'a' to 'z'
-    const alphabet = 'abc'.split('');
+    const alphabet = [...'abcdefghijklmnopqrstuvwxyz'];
+    // Iterate through each letter
     // eslint-disable-next-line functional/no-loop-statement
     for (const letter of alphabet) {
         console.log(`Saving letter ${letter}`);
-        const fighterObjs = await getFighterObjs(page, letter);
-        await Promise.all(fighterObjs.map(fighterObj => saveFighterObj(fighterObj)))
+        const fighterNameObjs = await getFighterNameObjs(pageAllFighter, letter);
+        console.log(`Total number of fighter in letter ${letter}: ${fighterNameObjs.length}`);
+        // Iterate through each fighter URL
+        // eslint-disable-next-line functional/no-loop-statement
+        for (const [index, fighterNameObj] of fighterNameObjs.entries()) {
+            console.log(`Saving fighter ${index + 1} / ${fighterNameObjs.length}`);
+            const fightHistoryObjs = await getFightHistoryObjs(pageSingleFighter, fighterNameObj.fighterId);
+            const fighterObj = { ...fighterNameObj, fightHistory: fightHistoryObjs };
+            // Save fighterObj
+            await saveFighterObj(fighterObj);
+            await new Promise(resolve => setTimeout(resolve, SCRAPING_TIMTOUT)); // Wait
+        }
+        console.log(`Letter ${letter} is saved.`);
+        await new Promise(resolve => setTimeout(resolve, SCRAPING_TIMTOUT)); // Wait
     }
-    // Close browser and page
-    await page.close();
+    // Close browser
     await browser.close();
     // Disconnect from database
     db.close();
     console.log('Disconnected from Database');
 }
 
-export const getFightHistoryWrapper = async () => {
-    // Start browser and pages
-    const browser = await chromium.launch();
-    const pageAllFighter = await browser.newPage();
-    const pageSingleFighter = await browser.newPage();
-    // Get all fighter objs for letter 'a'
-    const fighterObjs = await getFighterObjs(pageAllFighter, 'a');
-    // Iterate throught fighterObj to get fightHistory Obj
-    // eslint-disable-next-line functional/no-loop-statement
-    for (const fighterObj of fighterObjs) {
-        const fightHistoryAll = await getFightHistory(pageSingleFighter, fighterObj.fighterId);
-        const newFighterObj = { ...fighterObj, fightHistory: fightHistoryAll };
-        console.log(newFighterObj)
-        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3000ms
-    }
-    await browser.close();
-}
-
-getFightHistoryWrapper();
+saveFighterObjWrapper();
