@@ -8,9 +8,9 @@ import { saveFighterObj } from "./fighter/fighter.dal";
 import { getFighterNameObjs, getFightHistoryObjs } from './fighter/fighter.scrape';
 import { getPublicIP } from "./utility/network";
 
-const SCRAPING_TIMTOUT = 3000;
+const SCRAPING_TIMTOUT = 2000;
 
-export const saveFighterObjWrapper = async () => {
+export const scrapeAllFighter = async () => {
     // Connect to database
     mongoose.connect(process.env.DATABASE_URL, {
         useNewUrlParser: true,
@@ -21,14 +21,24 @@ export const saveFighterObjWrapper = async () => {
     db.once('open', () => console.log('Connected to Database'))
     // Start browser and page
     console.log('Starting browser');
-    const browser = await chromium.launch();
+    const browser = process.env.USE_SOCKS5 == "true" ?
+        await chromium.launch()
+        : await chromium.launch({
+            proxy: {
+                server: process.env.SOCKS5_URL,
+                username: process.env.SOCKS5_USERNAME,
+                password: process.env.SOCKS5_PASSWORD
+            }
+        });
     const pageAllFighter = await browser.newPage();
     const pageSingleFighter = await browser.newPage();
     // Check the public IP of the current connection
-    const pageCheckIP = await browser.newPage();
-    const myIP = await getPublicIP(pageCheckIP);
-    console.log(`Public IP: ${myIP}`);
-    await pageCheckIP.close();
+    if (process.env.SHOULD_CHECKIP == "true") {
+        const pageCheckIP = await browser.newPage();
+        const myIP = await getPublicIP(pageCheckIP);
+        console.log(`Public IP: ${myIP}`);
+        await pageCheckIP.close();
+    }
     // Get and save fighterobjs from 'a' to 'z'
     const alphabet = [...'abcdefghijklmnopqrstuvwxyz'];
     // Spawn multiple progress bars
@@ -60,4 +70,4 @@ export const saveFighterObjWrapper = async () => {
     console.log('Disconnected from Database');
 }
 
-saveFighterObjWrapper();
+scrapeAllFighter();

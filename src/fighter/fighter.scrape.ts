@@ -28,24 +28,35 @@ export const getFighterNameObjs = async (page: Page, letter: string) => {
 
 export const getFightHistoryObjs = async (page: Page, fighterId: string) => {
     await page.goto(process.env.FIGHT_HISTORY_URL + fighterId);
-    const fightHistoryObjs = await page.$$eval('.ResponsiveTable.fight-history table tbody tr', rowEls => {
+    const allFightHistoryObjs = await page.$$eval('.ResponsiveTable.fight-history table tbody tr', rowEls => {
         return Array.from(rowEls, rowEl => {
             const dataEls = rowEl.querySelectorAll('td');
             const dataArray = Array.from(dataEls, dataEl => dataEl.innerText);
-            const anchorEl = rowEl.querySelector('a');
-            const anchorURL = anchorEl.getAttribute('href');
-            const fightHistoryObj = {
-                date: dataArray[0],
-                opponent: dataArray[1],
-                opponnetId: anchorURL.split('/').slice(-2)[0],
-                result: dataArray[2],
-                decision: dataArray[3],
-                round: dataArray[4],
-                time: dataArray[5],
-                event: dataArray[6]
-            };
-            return fightHistoryObj;
+            // Exception handling: Doesn't have any opponent information
+            // Only select anchor in the second data cell, in-case the event has link but not the opponent
+            const anchorEl = rowEl.querySelector('td:nth-child(2) > a');
+            if (anchorEl == null) {
+                return null;
+            } else {
+                const anchorURL = anchorEl.getAttribute('href');
+                const OpponentId = anchorURL.split('/').slice(-2)[0];
+                const fightHistoryObj = {
+                    date: dataArray[0],
+                    opponent: dataArray[1],
+                    opponnetId: OpponentId,
+                    result: dataArray[2],
+                    decision: dataArray[3],
+                    round: dataArray[4],
+                    time: dataArray[5],
+                    event: dataArray[6]
+                };
+                return fightHistoryObj;
+            }
         })
+    })
+    // Remove all null objects
+    const fightHistoryObjs = allFightHistoryObjs.filter(fightHistoryObj => {
+        return fightHistoryObj != null;
     })
     return fightHistoryObjs;
 }
