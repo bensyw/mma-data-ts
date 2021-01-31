@@ -45,7 +45,9 @@
     "@bitauth/libauth": "^1.17.1",
     "dotenv": "^8.2.0",
     "mongoose": "^5.11.14",
-    "playwright": "^1.8.0"
+    "multi-progress": "^4.0.0",
+    "playwright": "^1.8.0",
+    "progress": "^2.0.3"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
