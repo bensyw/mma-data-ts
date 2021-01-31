@@ -41,8 +41,7 @@ Saving fighter 1037/1343 [=======================================-----------]
 ```
 
 ## Document Schema
-```JavaScript
-// TODO: Add strongly typed schema
+```TypeScript
 const fightHistorySchema = new mongoose.Schema({
     date: { type: String },
     opponent: { type: String },

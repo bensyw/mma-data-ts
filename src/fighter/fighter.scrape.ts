@@ -1,24 +1,17 @@
-/* eslint-disable functional/prefer-type-literal */
-import { Page } from 'playwright';
-
-export interface Fighter {
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly fighterId: string;
-}
+import { Page } from "playwright";
 
 export const getFighterNameObjs = async (page: Page, letter: string) => {
 
     await page.goto(process.env.FIGHTER_URL + letter);
-    const fighterNameObjs = await page.$$eval('tr.oddrow>td>a, tr.evenrow>td>a', anchorEls => {
+    const fighterNameObjs = await page.$$eval("tr.oddrow>td>a, tr.evenrow>td>a", anchorEls => {
         return Array.from(anchorEls, anchorEl => {
-            const anchorURL = anchorEl.getAttribute('href');
+            const anchorURL = anchorEl.getAttribute("href");
             const anchorInnerText = (<HTMLElement>anchorEl).innerText;
-            const fighterNames = anchorInnerText.split(', ');
-            const fighterNameObj: Fighter = {
+            const fighterNames = anchorInnerText.split(", ");
+            const fighterNameObj = {
                 firstName: fighterNames[1],
                 lastName: fighterNames[0],
-                fighterId: anchorURL.split('/').slice(-2)[0]
+                fighterId: anchorURL.split("/").slice(-2)[0]
             }
             return fighterNameObj
         })
@@ -28,18 +21,18 @@ export const getFighterNameObjs = async (page: Page, letter: string) => {
 
 export const getFightHistoryObjs = async (page: Page, fighterId: string) => {
     await page.goto(process.env.FIGHT_HISTORY_URL + fighterId);
-    const allFightHistoryObjs = await page.$$eval('.ResponsiveTable.fight-history table tbody tr', rowEls => {
+    const allFightHistoryObjs = await page.$$eval(".ResponsiveTable.fight-history table tbody tr", rowEls => {
         return Array.from(rowEls, rowEl => {
-            const dataEls = rowEl.querySelectorAll('td');
+            const dataEls = rowEl.querySelectorAll("td");
             const dataArray = Array.from(dataEls, dataEl => dataEl.innerText);
-            // Exception handling: Doesn't have any opponent information
+            // Exception handling: Doesn"t have any opponent information
             // Only select anchor in the second data cell, in-case the event has link but not the opponent
-            const anchorEl = rowEl.querySelector('td:nth-child(2) > a');
+            const anchorEl = rowEl.querySelector("td:nth-child(2) > a");
             if (anchorEl == null) {
                 return null;
             } else {
-                const anchorURL = anchorEl.getAttribute('href');
-                const OpponentId = anchorURL.split('/').slice(-2)[0];
+                const anchorURL = anchorEl.getAttribute("href");
+                const OpponentId = anchorURL.split("/").slice(-2)[0];
                 const fightHistoryObj = {
                     date: dataArray[0],
                     opponent: dataArray[1],
