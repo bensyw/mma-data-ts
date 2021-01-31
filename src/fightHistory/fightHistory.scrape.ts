@@ -1,7 +1,6 @@
-import { Browser } from "playwright";
+import { Page } from 'playwright';
 
-export const getFightHistory = async (fighterId: string, browser: Browser) => {
-    const page = await browser.newPage();
+export const getFightHistory = async (page: Page, fighterId: string) => {
     await page.goto(process.env.FIGHT_HISTORY_URL + fighterId);
     const fightHistoryAll = await page.$$eval('.ResponsiveTable.fight-history table tbody tr', rowEls => {
         return Array.from(rowEls, rowEl => {
@@ -22,7 +21,5 @@ export const getFightHistory = async (fighterId: string, browser: Browser) => {
             return fightHistory;
         })
     })
-    console.log(fightHistoryAll)
-    await page.close();
     return fightHistoryAll;
 }

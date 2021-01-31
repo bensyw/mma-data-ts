@@ -36,8 +36,20 @@ export const saveFighterObjWrapper = async () => {
 }
 
 export const getFightHistoryWrapper = async () => {
+    // Start browser and pages
     const browser = await chromium.launch();
-    await getFightHistory('2506549', browser);
+    const pageAllFighter = await browser.newPage();
+    const pageSingleFighter = await browser.newPage();
+    // Get all fighter objs for letter 'a'
+    const fighterObjs = await getFighterObjs(pageAllFighter, 'a');
+    // Iterate throught fighterObj to get fightHistory Obj
+    // eslint-disable-next-line functional/no-loop-statement
+    for (const fighterObj of fighterObjs) {
+        const fightHistoryAll = await getFightHistory(pageSingleFighter, fighterObj.fighterId);
+        const newFighterObj = { ...fighterObj, fightHistory: fightHistoryAll };
+        console.log(newFighterObj)
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3000ms
+    }
     await browser.close();
 }
 
